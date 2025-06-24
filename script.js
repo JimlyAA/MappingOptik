@@ -1,17 +1,11 @@
-// Langkah 1: Inisialisasi Peta
-// Mengatur koordinat tengah peta (diambil di sekitar pusat Depok) dan level zoom.
-// Level zoom 13 dirasa pas untuk melihat keseluruhan sebaran data Anda.
+// Inisialisasi Peta
 const map = L.map('map').setView([-6.385, 106.83], 13);
-
-// Langkah 2: Menambahkan Peta Dasar (Basemap)
-// Menggunakan peta dasar gratis dari OpenStreetMap.
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-// Langkah 3: Data Lokasi Optik
-// Ini adalah data yang Anda berikan, sudah dalam format yang benar.
+// Data Lokasi Optik
 const dataToko = [
     { nama: "kajamata", lat: -6.352943247241355, lon: 106.83688346770158 },
     { nama: "Optik yogya", lat: -6.355037412823192, lon: 106.84279919005748 },
@@ -42,12 +36,77 @@ const dataToko = [
     { nama: "OPTIK POLARIS", lat: -6.442255594394748, lon: 106.81943624773703 }
 ];
 
-// Langkah 4: Menampilkan Setiap Lokasi sebagai Penanda (Marker) di Peta
-// Menggunakan loop 'forEach' untuk membaca setiap item di dalam array dataToko.
-dataToko.forEach(toko => {
-    // Membuat marker untuk setiap toko di koordinat yang sesuai.
-    const marker = L.marker([toko.lat, toko.lon]).addTo(map);
+
+// Variabel global untuk menyimpan referensi ke marker
+const markers = {};
+
+// Fungsi untuk mengisi daftar sidebar
+function populateSidebar(data) {
+    const storeList = document.getElementById('store-list');
+    const storeCount = document.getElementById('store-count');
     
-    // Menambahkan popup yang menampilkan nama toko saat marker di-klik.
-    marker.bindPopup(`<b>${toko.nama}</b>`);
-});
+    // Kosongkan daftar sebelum mengisi ulang
+    storeList.innerHTML = '';
+    
+    // Update jumlah total
+    storeCount.textContent = data.length;
+
+    data.forEach(toko => {
+        // Buat elemen list item
+        const li = document.createElement('li');
+        li.innerHTML = `<b>${toko.nama}</b><span>Lat: ${toko.lat.toFixed(5)}, Lon: ${toko.lon.toFixed(5)}</span>`;
+        
+        // Tambahkan event listener untuk klik
+        li.addEventListener('click', () => {
+            const targetMarker = markers[toko.nama];
+            if (targetMarker) {
+                map.flyTo(targetMarker.getLatLng(), 17); // Zoom lebih dekat saat diklik
+                targetMarker.openPopup();
+            }
+        });
+
+        storeList.appendChild(li);
+    });
+}
+
+// Fungsi untuk menambahkan marker ke peta
+// VERSI BARU - GUNAKAN INI
+function addMarkers(data) {
+    data.forEach(toko => {
+        // 1. Buat konten untuk popup menjadi lebih informatif
+        const popupContent = `
+            <div style="font-family: 'Poppins', sans-serif;">
+                <b>${toko.nama}</b>
+                <hr style="margin: 5px 0;">
+                <span style="font-size: 0.9em;">Koordinat:</span><br>
+                <span style="font-size: 0.85em; color: #555;">${toko.lat.toFixed(6)}, ${toko.lon.toFixed(6)}</span>
+            </div>
+        `;
+
+        // 2. Buat marker dan ikat dengan popup yang baru
+        const marker = L.marker([toko.lat, toko.lon]).addTo(map)
+            .bindPopup(popupContent);
+        
+        // 3. Simpan referensi marker (tidak ada perubahan di sini)
+        markers[toko.nama] = marker;
+    });
+}
+
+// Fungsi untuk filter pencarian
+function filterStores(event) {
+    const searchTerm = event.target.value.toLowerCase();
+    const filteredData = dataToko.filter(toko => 
+        toko.nama.toLowerCase().includes(searchTerm)
+    );
+    populateSidebar(filteredData);
+}
+
+// Event Listener untuk kotak pencarian
+const searchBox = document.getElementById('search-box');
+searchBox.addEventListener('keyup', filterStores);
+
+
+// --- Inisialisasi Aplikasi ---
+// Panggil fungsi-fungsi di awal untuk menampilkan data
+addMarkers(dataToko);
+populateSidebar(dataToko);
