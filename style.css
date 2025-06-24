@@ -1,11 +1,165 @@
-/* Menghapus spasi bawaan dari browser */
+/* Import Font dari Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/* Reset dan Pengaturan Dasar */
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
 }
 
-/* Mengatur agar elemen dengan ID 'map' memenuhi seluruh layar */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.app-header {
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.app-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.app-header .logo i {
+    font-size: 2rem;
+    color: #007BFF;
+}
+
+.app-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.app-header p {
+    margin: 0.25rem 0 0;
+    color: #666;
+}
+
+/* Konten Utama (Peta + Sidebar) */
+.main-content {
+    display: flex;
+    flex-grow: 1; /* Mengisi sisa ruang */
+    overflow: hidden; /* Mencegah scrolling di level ini */
+}
+
+/* Kolom Peta */
+#map-container {
+    flex: 3; /* Peta mengambil 3 bagian ruang */
+    position: relative; /* Diperlukan untuk posisi legenda */
+}
+
 #map {
-    width: 100vw; /* 100% dari lebar viewport/layar */
-    height: 100vh; /* 100% dari tinggi viewport/layar */
+    width: 100%;
+    height: 100%;
+}
+
+#legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000; /* Agar di atas peta */
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
+#legend h4 {
+    margin: 0 0 5px 0;
+}
+
+/* Kolom Sidebar */
+.sidebar {
+    flex: 1; /* Sidebar mengambil 1 bagian ruang */
+    background-color: #ffffff;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden; /* Mencegah scroll di level ini */
+    border-left: 1px solid #e0e0e0;
+}
+
+.sidebar-header input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.store-list-container {
+    flex-grow: 1;
+    overflow-y: auto; /* Scroll hanya pada daftar ini */
+    margin-top: 1rem;
+}
+.store-list-container h3 {
+    margin: 0 0 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.count-badge {
+    background-color: #007BFF;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+}
+
+#store-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#store-list li {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#store-list li:hover {
+    background-color: #f0f8ff;
+}
+#store-list li b {
+    display: block;
+    font-size: 1.1rem;
+}
+#store-list li span {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+/* Footer */
+.app-footer {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+}
+
+/* Desain Responsif untuk Mobile */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+    .sidebar {
+        min-height: 300px; /* Beri tinggi minimum saat di mobile */
+        border-left: none;
+        border-top: 1px solid #e0e0e0;
+    }
 }
