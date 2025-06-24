@@ -1,0 +1,11 @@
+/* Menghapus spasi bawaan dari browser */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Mengatur agar elemen dengan ID 'map' memenuhi seluruh layar */
+#map {
+    width: 100vw; /* 100% dari lebar viewport/layar */
+    height: 100vh; /* 100% dari tinggi viewport/layar */
+}
