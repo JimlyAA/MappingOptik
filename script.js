@@ -5,7 +5,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-// Data Lokasi Optik
+// Data Lokasi Optik (tetap sama)
 const dataToko = [
     { nama: "kajamata", lat: -6.352943247241355, lon: 106.83688346770158 },
     { nama: "Optik yogya", lat: -6.355037412823192, lon: 106.84279919005748 },
@@ -40,27 +40,31 @@ const dataToko = [
 // Variabel global untuk menyimpan referensi ke marker
 const markers = {};
 
-// Fungsi untuk mengisi daftar sidebar
+// Fungsi untuk mengisi daftar sidebar (dengan kelas Tailwind)
 function populateSidebar(data) {
     const storeList = document.getElementById('store-list');
     const storeCount = document.getElementById('store-count');
-    
-    // Kosongkan daftar sebelum mengisi ulang
     storeList.innerHTML = '';
-    
-    // Update jumlah total
     storeCount.textContent = data.length;
 
+    if (data.length === 0) {
+        storeList.innerHTML = `<li class="p-4 text-center text-gray-500">Lokasi tidak ditemukan.</li>`;
+        return;
+    }
+
     data.forEach(toko => {
-        // Buat elemen list item
         const li = document.createElement('li');
-        li.innerHTML = `<b>${toko.nama}</b><span>Lat: ${toko.lat.toFixed(5)}, Lon: ${toko.lon.toFixed(5)}</span>`;
+        // Menggunakan kelas Tailwind untuk tampilan list item
+        li.className = 'p-4 cursor-pointer hover:bg-blue-50 transition-colors';
+        li.innerHTML = `
+            <h4 class="font-semibold text-gray-800">${toko.nama}</h4>
+            <p class="text-xs text-gray-500">Lat: ${toko.lat.toFixed(5)}, Lon: ${toko.lon.toFixed(5)}</p>
+        `;
         
-        // Tambahkan event listener untuk klik
         li.addEventListener('click', () => {
             const targetMarker = markers[toko.nama];
             if (targetMarker) {
-                map.flyTo(targetMarker.getLatLng(), 17); // Zoom lebih dekat saat diklik
+                map.flyTo(targetMarker.getLatLng(), 17);
                 targetMarker.openPopup();
             }
         });
@@ -69,30 +73,24 @@ function populateSidebar(data) {
     });
 }
 
-// Fungsi untuk menambahkan marker ke peta
-// VERSI BARU - GUNAKAN INI
+// Fungsi untuk menambahkan marker ke peta (dengan popup yang lebih baik)
 function addMarkers(data) {
     data.forEach(toko => {
-        // 1. Buat konten untuk popup menjadi lebih informatif
         const popupContent = `
-            <div style="font-family: 'Poppins', sans-serif;">
-                <b>${toko.nama}</b>
-                <hr style="margin: 5px 0;">
-                <span style="font-size: 0.9em;">Koordinat:</span><br>
-                <span style="font-size: 0.85em; color: #555;">${toko.lat.toFixed(6)}, ${toko.lon.toFixed(6)}</span>
+            <div class="text-sm">
+                <div class="font-bold mb-1">${toko.nama}</div>
+                <div class="text-gray-600">
+                    ${toko.lat.toFixed(6)}, ${toko.lon.toFixed(6)}
+                </div>
             </div>
         `;
-
-        // 2. Buat marker dan ikat dengan popup yang baru
         const marker = L.marker([toko.lat, toko.lon]).addTo(map)
             .bindPopup(popupContent);
-        
-        // 3. Simpan referensi marker (tidak ada perubahan di sini)
         markers[toko.nama] = marker;
     });
 }
 
-// Fungsi untuk filter pencarian
+// Fungsi untuk filter pencarian (tetap sama)
 function filterStores(event) {
     const searchTerm = event.target.value.toLowerCase();
     const filteredData = dataToko.filter(toko => 
@@ -103,10 +101,9 @@ function filterStores(event) {
 
 // Event Listener untuk kotak pencarian
 const searchBox = document.getElementById('search-box');
-searchBox.addEventListener('keyup', filterStores);
+searchBox.addEventListener('input', filterStores);
 
 
 // --- Inisialisasi Aplikasi ---
-// Panggil fungsi-fungsi di awal untuk menampilkan data
 addMarkers(dataToko);
 populateSidebar(dataToko);
