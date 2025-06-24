@@ -108,34 +108,3 @@ searchBox.addEventListener('input', filterStores);
 addMarkers(dataToko);
 populateSidebar(dataToko);
 
-// --- TAMBAHKAN KODE BARU DI BAWAH INI ---
-
-// Fungsi untuk mengatur style garis batas
-function styleBatas(feature) {
-    return {
-        color: "#e60000",      // Warna garis (merah menyala)
-        weight: 2,           // Ketebalan garis
-        opacity: 0.8,        // Transparansi garis
-        fillColor: "#e60000",  // Warna isian poligon
-        fillOpacity: 0.1     // Transparansi isian
-    };
-}
-
-// Memuat dan menampilkan file GeoJSON
-fetch('depok-boundary.geojson')
-    .then(response => {
-        // Cek jika file berhasil diakses
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json(); // Ubah response menjadi format JSON
-    })
-    .then(data => {
-        // Tampilkan data GeoJSON di peta Leaflet dengan style yang sudah ditentukan
-        L.geoJSON(data, { style: styleBatas }).addTo(map);
-    })
-    .catch(error => {
-        // Tampilkan pesan error di console jika file tidak ditemukan atau gagal dimuat
-        console.error('Error memuat GeoJSON:', error);
-        alert('Gagal memuat data batas wilayah. Pastikan file depok-boundary.geojson ada di folder yang benar.');
-    });
