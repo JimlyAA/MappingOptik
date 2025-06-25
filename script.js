@@ -5,7 +5,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-// Data Lokasi Optik (tetap sama)
+// Data Lokasi Optik
 const dataToko = [
     { nama: "kajamata", lat: -6.352943247241355, lon: 106.83688346770158 },
     { nama: "Optik yogya", lat: -6.355037412823192, lon: 106.84279919005748 },
@@ -40,7 +40,7 @@ const dataToko = [
 // Variabel global untuk menyimpan referensi ke marker
 const markers = {};
 
-// Fungsi untuk mengisi daftar sidebar (dengan kelas Tailwind)
+// Fungsi untuk mengisi daftar sidebar
 function populateSidebar(data) {
     const storeList = document.getElementById('store-list');
     const storeCount = document.getElementById('store-count');
@@ -54,7 +54,6 @@ function populateSidebar(data) {
 
     data.forEach(toko => {
         const li = document.createElement('li');
-        // Menggunakan kelas Tailwind untuk tampilan list item
         li.className = 'p-4 cursor-pointer hover:bg-blue-50 transition-colors';
         li.innerHTML = `
             <h4 class="font-semibold text-gray-800">${toko.nama}</h4>
@@ -64,6 +63,10 @@ function populateSidebar(data) {
         li.addEventListener('click', () => {
             const targetMarker = markers[toko.nama];
             if (targetMarker) {
+                // Jika di mobile, pindah ke tampilan peta dulu
+                if (window.innerWidth < 1024) {
+                    showMapBtn.click();
+                }
                 map.flyTo(targetMarker.getLatLng(), 17);
                 targetMarker.openPopup();
             }
@@ -73,7 +76,7 @@ function populateSidebar(data) {
     });
 }
 
-// Fungsi untuk menambahkan marker ke peta (dengan popup yang lebih baik)
+// Fungsi untuk menambahkan marker ke peta
 function addMarkers(data) {
     data.forEach(toko => {
         const popupContent = `
@@ -90,7 +93,7 @@ function addMarkers(data) {
     });
 }
 
-// Fungsi untuk filter pencarian (tetap sama)
+// Fungsi untuk filter pencarian
 function filterStores(event) {
     const searchTerm = event.target.value.toLowerCase();
     const filteredData = dataToko.filter(toko => 
@@ -99,12 +102,44 @@ function filterStores(event) {
     populateSidebar(filteredData);
 }
 
-// Event Listener untuk kotak pencarian
-const searchBox = document.getElementById('search-box');
-searchBox.addEventListener('input', filterStores);
-
-
 // --- Inisialisasi Aplikasi ---
 addMarkers(dataToko);
 populateSidebar(dataToko);
 
+const searchBox = document.getElementById('search-box');
+searchBox.addEventListener('input', filterStores);
+
+
+// --- LOGIKA UNTUK TAMPILAN MOBILE ---
+
+// Ambil elemen-elemen yang diperlukan dari HTML
+const showMapBtn = document.getElementById('show-map-btn');
+const showListBtn = document.getElementById('show-list-btn');
+const mapContainer = document.getElementById('map-container');
+const sidebarContainer = document.getElementById('sidebar-container');
+
+// Event listener untuk tombol "Peta"
+showMapBtn.addEventListener('click', () => {
+    mapContainer.classList.remove('hidden');
+    sidebarContainer.classList.add('hidden');
+
+    showMapBtn.classList.add('bg-blue-600', 'text-white');
+    showMapBtn.classList.remove('bg-gray-200', 'text-gray-700');
+    showListBtn.classList.add('bg-gray-200', 'text-gray-700');
+    showListBtn.classList.remove('bg-blue-600', 'text-white');
+
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+});
+
+// Event listener untuk tombol "Daftar"
+showListBtn.addEventListener('click', () => {
+    sidebarContainer.classList.remove('hidden');
+    mapContainer.classList.add('hidden');
+
+    showListBtn.classList.add('bg-blue-600', 'text-white');
+    showListBtn.classList.remove('bg-gray-200', 'text-gray-700');
+    showMapBtn.classList.add('bg-gray-200', 'text-gray-700');
+    showMapBtn.classList.remove('bg-blue-600', 'text-white');
+});
